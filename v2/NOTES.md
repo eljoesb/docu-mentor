@@ -1,6 +1,7 @@
 # v2 — BM25 Baseline: Observaciones crudas
 
 ## Setup
+
 - Corpus: 2912 chunks (mismo chunking que v1, copiado textual)
 - Tokenización: lowercase + split por espacios (lo tonto)
 - Index + búsqueda de 21 queries: < 0.2s total. Sin caché necesario.
@@ -20,6 +21,7 @@ chunk exacto.
 ## Dónde gana cada uno
 
 ### Embeddings gana en queries conceptuales/semánticas
+
 - **Q1** "what is autograd": embeddings → autograd.rst (definición perfecta).
   BM25 → distributed_autograd.rst (contexto distribuido, no la definición).
   BM25 matcheó "autograd" en el archivo equivocado porque distributed_autograd
@@ -46,6 +48,7 @@ chunk exacto.
   captura la semántica de "comparar dos conceptos".
 
 ### BM25 gana en queries con keywords específicos
+
 - **Q3** "how to use DataLoader with multiple workers": BM25 → randomness.rst
   con código real de `DataLoader(num_workers=...)`. Embeddings → data.md con
   notas sobre serialización en Windows. BM25 matcheó "DataLoader", "workers",
@@ -59,6 +62,7 @@ chunk exacto.
   "function", "autograd" juntos.
 
 ### Ambos decentes o ambos malos
+
 - **Q8, Q9, Q17, Q21**: ambos encuentran chunks razonables (o el mismo).
 - **Q4, Q5, Q16** (out-of-domain): ambos devuelven basura, como se espera.
   Ningún retriever debería encontrar algo útil para "chocolate chip cookies"
@@ -69,13 +73,13 @@ chunk exacto.
 
 ## Patrón claro
 
-| Tipo de query | Gana |
-|---|---|
-| Conceptual ("what is X") | Embeddings |
-| Jargon mismatch (el usuario no usa el término técnico) | Embeddings |
-| Keyword-rich ("save and load a model") | BM25 |
-| API names con puntos ("torch.nn.functional.linear") | Ninguno (tokenización rota) |
-| Out-of-domain | Empate (ambos basura, bien) |
+| Tipo de query                                          | Gana                        |
+| ------------------------------------------------------ | --------------------------- |
+| Conceptual ("what is X")                               | Embeddings                  |
+| Jargon mismatch (el usuario no usa el término técnico) | Embeddings                  |
+| Keyword-rich ("save and load a model")                 | BM25                        |
+| API names con puntos ("torch.nn.functional.linear")    | Ninguno (tokenización rota) |
+| Out-of-domain                                          | Empate (ambos basura, bien) |
 
 ## Observación sobre tokenización (Q11)
 
@@ -99,9 +103,10 @@ terminología técnica ("division by zero in backward", "optimizer state_dict").
 ## Conclusión para hybrid search
 
 Esto es exactamente el caso para combinar ambos:
+
 - BM25 gana cuando las keywords del usuario aparecen literalmente en el chunk correcto
 - Embeddings gana cuando hay gap semántico entre la pregunta y la respuesta
-- No se complementan al azar — se complementan *sistemáticamente* en tipos de query distintos
+- No se complementan al azar — se complementan _sistemáticamente_ en tipos de query distintos
 
 Un hybrid search con RRF debería capturar lo mejor de ambos: en Q12 (save/load),
 el chunk de serialization.rst subiría en el ranking combinado. En Q1 (autograd),
@@ -203,8 +208,7 @@ es precisamente donde embeddings brilla y BM25 no tiene forma de competir.
 
 ### Setup
 
-Segundo tokenizer: `re.sub(r"[.\-_()/\\\[\]{}'\"\`]", " ", text.lower()).split()`
-Rompe `torch.nn.functional.linear` → `["torch", "nn", "functional", "linear"]`.
+Segundo tokenizer: `re.sub(r"[.\-_()/\\\[\]{}'\"\`]", " ", text.lower()).split()`Rompe`torch.nn.functional.linear`→`["torch", "nn", "functional", "linear"]`.
 Ambos tokenizers corren sobre el mismo corpus de 2912 chunks. Indexación: 0.09s.
 
 ### Resultado: 9/21 queries cambiaron de chunk entre dumb y smart
@@ -257,17 +261,17 @@ tokenizer tonto matcheaba mejor.**
 
 ### Tabla de ganadores y perdedores
 
-| Query | Dumb | Smart | Veredicto |
-|---|---|---|---|
-| Q11 (functional.linear) | basura | tangencial | Smart gana |
-| Q14 (flatten + linear) | basura | nn.rst (directo) | Smart gana |
-| Q20 (view vs reshape) | lista de funciones | tensor_view.rst | Smart gana |
-| Q12 (save/load model) | serialization.rst (directo) | autograd/inference | **Smart pierde** |
-| Q2 (move to GPU) | governance (basura) | rpc (basura) | Empate (ambos mal) |
-| Q3 (DataLoader workers) | randomness.rst | faq.rst | Lateral |
-| Q13 (numpy to tensor) | compiler_faq (name-drop) | extending.rst | Lateral (ambos tangenciales) |
-| Q15 (custom autograd) | extending.rst | extending.func.rst | Lateral |
-| Q16 (database, OOD) | governance.rst | data.md | Lateral (ambos OOD) |
+| Query                   | Dumb                        | Smart              | Veredicto                    |
+| ----------------------- | --------------------------- | ------------------ | ---------------------------- |
+| Q11 (functional.linear) | basura                      | tangencial         | Smart gana                   |
+| Q14 (flatten + linear)  | basura                      | nn.rst (directo)   | Smart gana                   |
+| Q20 (view vs reshape)   | lista de funciones          | tensor_view.rst    | Smart gana                   |
+| Q12 (save/load model)   | serialization.rst (directo) | autograd/inference | **Smart pierde**             |
+| Q2 (move to GPU)        | governance (basura)         | rpc (basura)       | Empate (ambos mal)           |
+| Q3 (DataLoader workers) | randomness.rst              | faq.rst            | Lateral                      |
+| Q13 (numpy to tensor)   | compiler_faq (name-drop)    | extending.rst      | Lateral (ambos tangenciales) |
+| Q15 (custom autograd)   | extending.rst               | extending.func.rst | Lateral                      |
+| Q16 (database, OOD)     | governance.rst              | data.md            | Lateral (ambos OOD)          |
 
 Score: 3 ganancias claras, 1 regresión clara (Q12), 5 laterales.
 (Q13 parecía regresión pero tras verificación manual es lateral — ver
@@ -345,6 +349,7 @@ aporta.
 **9/21 queries difieren entre dumb y smart.**
 
 De esas 9:
+
 - 3 smart cualitativamente mejor a ojo: Q11, Q14, Q20
 - 1 smart cualitativamente peor: Q12
 - 5 lateral (ni mejor ni peor de forma clara): Q2, Q3, Q13, Q15, Q16
@@ -365,6 +370,7 @@ la evaluación manual de v1).
 **Predicción: 7/21.**
 
 Razonamiento:
+
 - Los 3 buenos existentes se mantienen: RRF no debería romperlos porque
   embeddings ya los rankea #1 y ese voto pesa en la fusión.
 - Q14 sube a bueno: BM25-smart encuentra nn.rst con `Flatten`/`Unflatten`
@@ -381,6 +387,7 @@ Razonamiento:
   el top-k de algún sistema.
 
 Riesgos a la baja:
+
 - RRF combina rankings, no garantiza que el top-1 después de fusión sea
   el mejor de cada sistema. Si embeddings tiene el chunk correcto en #1
   y BM25 lo tiene en #50, el chunk de BM25 #1 (basura) puede competir.
@@ -471,11 +478,13 @@ sistema individual hubiera elegido, pero que es el mejor de los tres.
 **Q2 (move tensor to GPU) — compromise, D:9 S:2**
 
 Hybrid eligió notes/mps.rst que muestra:
+
 ```
 mps_device = torch.device("mps")
 x = torch.ones(5, device=mps_device)
 model.to(mps_device)
 ```
+
 El patrón `.to(device)` es correcto pero para MPS (Apple Silicon), no CUDA.
 Embeddings tenía tensor_attributes.rst (device=cuda, cómo se crean tensores
 en un device), que era tangencial pero sobre CUDA. La diferencia es menor:
@@ -498,19 +507,19 @@ Veredicto: tangencial. No mejoró vs embeddings.
 Aplico el mismo criterio que v1: "bueno" = el chunk responde directamente
 la pregunta. No sobrevalorar name-drops ni matches superficiales.
 
-| Categoría | Queries | Count |
-|---|---|---|
-| Bueno | Q9, Q13 | 2 |
-| Tangencial | Q2, Q3, Q6, Q8, Q11, Q12, Q15, Q17, Q18, Q19, Q20, Q21 | 12 |
-| Malo | Q1, Q4, Q5, Q7, Q10, Q14, Q16 | 7 |
+| Categoría  | Queries                                                | Count |
+| ---------- | ------------------------------------------------------ | ----- |
+| Bueno      | Q9, Q13                                                | 2     |
+| Tangencial | Q2, Q3, Q6, Q8, Q11, Q12, Q15, Q17, Q18, Q19, Q20, Q21 | 12    |
+| Malo       | Q1, Q4, Q5, Q7, Q10, Q14, Q16                          | 7     |
 
 **Resultado: 2/21 bueno.**
 
 ### Comparación con predicción
 
 | Métrica | Predicción | Resultado |
-|---|---|---|
-| Bueno | 7/21 | 2/21 |
+| ------- | ---------- | --------- |
+| Bueno   | 7/21       | 2/21      |
 
 **Me equivoqué por 5 queries enteras.** Dirección: mucho más pesimista de
 lo que predije.
@@ -518,6 +527,7 @@ lo que predije.
 Errores específicos de mi predicción:
 
 **Predije que se mantendrían y se perdieron:**
+
 - Q1: predije que RRF mantendría el bueno de embeddings. RRF lo perdió.
   La definición de autograd (D:0 en embeddings) fue superada por un chunk
   de distributed_autograd (D:4, S:3) porque el compromiso "decente en ambos"
@@ -527,6 +537,7 @@ Errores específicos de mi predicción:
   tangencial. El chunk de autograd.rst con el ejemplo de NaN era bueno.
 
 **Predije que subirían a bueno y no subieron:**
+
 - Q14: predije que nn.rst (Flatten) subiría. RRF eligió named_tensor.md en
   su lugar — un compromiso (D:1, S:12) que no ayuda.
 - Q15: predije que extending.func.rst subiría. RRF sí lo eligió (sparse_wins,
@@ -539,6 +550,7 @@ Errores específicos de mi predicción:
   SWA/EMA scheduling, no sobre el uso básico de schedulers.
 
 **No predije y fue ganancia:**
+
 - Q13: compromise encontró tensors.rst con conversión numpy-to-tensor.
   Ni embeddings ni BM25-smart lo tenían como top-1. RRF genuinamente
   surfaceó un chunk mejor. El único caso.
@@ -569,6 +581,7 @@ corpus y estos dos sistemas. No solo no llega a 10/21, sino que retrocede
 de 3/21 a 2/21.
 
 Posibles direcciones (sin implementar aún):
+
 1. **Bajar k** — con k=1, posición 0 da score 1/1=1.0 y posición 4 da
    score 1/5=0.2. Ahora "perfecto en uno" (1.0) le gana a "decente en
    ambos" (0.2+0.2=0.4). Esto preservaría los bueno de embeddings.
@@ -579,3 +592,5 @@ Posibles direcciones (sin implementar aún):
    confianza (score < threshold), no siempre.
 4. **Aceptar que el cuello de botella no es retrieval fusion** sino
    chunking y cobertura del corpus.
+
+### El patrón #6 es un hallazgo. "Hybrid movió queries de malo a tangencial pero no de tangencial a bueno. RRF suaviza los extremos — menos malos, más tangenciales, pocos buenos nuevos." Eso es una observación sobre RRF. Es un refinamiento específico del diagnóstico genérico que hicimos la sesión pasada ("RRF premia consenso sobre excelencia solitaria"). ese principio se manifiesta en este corpus: RRF no produce nuevos buenos porque los "decentes en ambos" tienden a ser tangenciales
