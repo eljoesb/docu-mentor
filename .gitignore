@@ -3,3 +3,4 @@ docs-source
 __pycache__
 
 .DS_Store
+docs
