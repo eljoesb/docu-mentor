@@ -1,0 +1,41 @@
+{"id": 1, "query": "what is autograd", "expected": "answer", "category": "core_concept", "notes": "BASELINE: query core de dominio. v1 respondió bien, score 0.6956. Baseline de 'debería funcionar'."}
+
+{"id": 2, "query": "how do I move a tensor to GPU", "expected": "answer", "category": "how_to", "notes": "BASELINE: query común de usuario. v1 recuperó chunk sobre crear tensors con device, no sobre mover. Respuesta parcial. Score 0.6807."}
+
+{"id": 3, "query": "how to use DataLoader with multiple workers", "expected": "answer", "category": "how_to", "notes": "BASELINE: v1 recuperó chunk tangencial (Windows multiprocessing) y LLM inventó num_workers. Fallo compuesto. Score 0.5216."}
+
+{"id": 4, "query": "what is the capital of France", "expected": "reject", "category": "out_of_domain", "notes": "BASELINE: control negativo obvio. v1 rechazó correctamente. Score 0.1160."}
+
+{"id": 5, "query": "how do I make chocolate chip cookies", "expected": "reject", "category": "out_of_domain", "notes": "BASELINE: control negativo obvio. v1 rechazó correctamente. Score 0.2190."}
+
+{"id": 6, "query": "what is the best optimizer for training GANs", "expected": "reject", "category": "opinion", "notes": "BASELINE: on-topic pero los docs no dan recomendaciones. v1 rechazó correctamente. Score 0.4664."}
+
+{"id": 7, "query": "how do I stop my model from memorizing the training data", "expected": "answer", "category": "jargon_mismatch", "notes": "BASELINE: pregunta de overfitting en jerga no técnica. v1 confundió 'memorizing' con 'accumulate history', respondió detach(). Confidently wrong. Score 0.5286. EL FALLO CATASTRÓFICO."}
+
+{"id": 8, "query": "How to use multiple GPUs in pytorch", "expected": "answer", "category": "how_to", "notes": "Top voted question sobre multi-GPU. Respuesta aceptada explica DataParallel y DistributedDataParallel, ambos documentados oficialmente.", "source_url": "https://stackoverflow.com/questions/54216920/how-to-use-multiple-gpus-in-pytorch"}
+
+{"id": 9, "query": "what is a leaf tensor", "expected": "answer", "category": "core_concept", "notes": "Concepto fundamental de Autograd. Crucial para entender por qué algunos gradientes son None. Se espera recuperación de la sección de 'Autograd mechanics'.", "source_url": "https://stackoverflow.com/questions/53591543/what-is-a-leaf-variable-in-pytorch"}
+
+{"id": 10, "query": "difference between .size() and .shape", "expected": "answer", "category": "core_concept", "notes": "Query técnica básica. .size() es herencia de Torch y .shape es para compatibilidad con NumPy. El RAG debe identificar que ambos devuelven la misma estructura.", "source_url": "https://stackoverflow.com/questions/47165333/what-is-the-difference-between-view-and-size-in-pytorch"}
+
+{"id": 11, "query": "what does torch.nn.functional.linear do", "expected": "answer", "category": "core_concept", "notes": "Operación base. Útil para verificar si el recuperador distingue entre el módulo nn.Linear y la función funcional.", "source_url": "https://pytorch.org/docs/stable/generated/torch.nn.functional.linear.html"}
+
+{"id": 12, "query": "how to save and load a model for inference", "expected": "answer", "category": "how_to", "notes": "Prueba de 'best practices'. Debe recomendar state_dict sobre guardar el objeto completo (que suele fallar por estructura de archivos).", "source_url": "https://stackoverflow.com/questions/42703561/how-to-save-and-load-a-trained-model-in-pytorch"}
+
+{"id": 13, "query": "convert numpy array to pytorch tensor", "expected": "answer", "category": "how_to", "notes": "Interoperabilidad básica. Se espera mención de torch.from_numpy para compartir memoria vs torch.tensor para copiar.", "source_url": "https://stackoverflow.com/questions/43328632/pytorch-convert-a-numpy-array-to-a-tensor"}
+
+{"id": 14, "query": "how to flatten a tensor before linear layer", "expected": "answer", "category": "how_to", "notes": "Paso común en CNNs. Evalúa si sugiere torch.flatten o nn.Flatten() según el contexto del modelo.", "source_url": "https://stackoverflow.com/questions/53953460/how-to-flatten-input-in-pytorch-before-passing-it-to-a-linear-layer"}
+
+{"id": 15, "query": "implement custom autograd function", "expected": "answer", "category": "how_to", "notes": "Query avanzada. Requiere recuperar la estructura de forward/backward estática. Alta probabilidad de que el LLM confunda con nn.Module.", "source_url": "https://pytorch.org/docs/stable/notes/extending.html"}
+
+{"id": 16, "query": "how do I batch insert records into a database", "expected": "reject", "category": "out_of_domain", "notes": "out_of_domain sutil inventada, no de SO. Usa 'batch' y 'records' (comunes en docs de dataset/sampling) pero el dominio es DB, no Tensores."}
+
+{"id": 17, "query": "pytorch vs tensorflow for deep learning", "expected": "reject", "category": "opinion", "notes": "Pregunta de comparación subjetiva/arquitectónica. El asistente debe declinar dar una preferencia personal basándose en que la documentación oficial no emite juicios de valor sobre otros frameworks.", "source_url": "https://stackoverflow.com/questions/50704381/is-pytorch-better-than-tensorflow"}
+
+{"id": 18, "query": "my model weights are not changing during training", "expected": "answer", "category": "jargon_mismatch", "notes": "El usuario describe un síntoma, no el término técnico (vanishing gradients o falta de optimizer.step()). Evalúa si el recuperador conecta 'weights not changing' con la sección de troubleshooting de Autograd.", "source_url": "https://discuss.pytorch.org/t/model-weights-are-not-updating/595"}
+
+{"id": 19, "query": "why is my loss nan", "expected": "answer", "category": "jargon_mismatch", "notes": "El usuario reporta un síntoma. El sistema debe recuperar info sobre estabilidad numérica, exploding gradients o normalización de datos.", "source_url": "https://discuss.pytorch.org/t/loss-is-nan-after-first-iteration/130149"}
+
+{"id": 20, "query": "view vs reshape", "expected": "either", "category": "ambiguous", "notes": "Sin contexto de si el tensor es contiguo o no, la respuesta 'correcta' depende. Un buen asistente debería explicar la diferencia de contigüidad o preguntar.", "source_url": "https://stackoverflow.com/questions/49643225/whats-the-difference-between-reshape-and-view-in-pytorch"}
+
+{"id": 21, "query": "how to update learning rate in middle of training", "expected": "either", "category": "ambiguous", "notes": "Puede referirse a optim.lr_scheduler o a la modificación manual de param_groups. Evalúa si el asistente es capaz de cubrir ambas o pedir clarificación.", "source_url": "https://stackoverflow.com/questions/48309923/how-to-update-learning-rate-in-the-middle-of-training-in-pytorch"}
