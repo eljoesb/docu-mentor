@@ -1,0 +1,22 @@
+query_id,query,source,label
+1,what is autograd,notes/autograd.rst,b
+2,how do I move a tensor to GPU,notes/mps.rst,m
+3,how to use DataLoader with multiple workers,data.md,b
+4,what is the capital of France,data.md,m
+5,how do I make chocolate chip cookies,cpp_index.rst,m
+6,what is the best optimizer for training GANs,notes/modules.rst,m
+7,how do I stop my model from memorizing the training data,optim.md,m
+8,How to use multiple GPUs in pytorch,notes/cuda.rst,b
+9,what is a leaf tensor,notes/autograd.rst,t
+10,difference between .size() and .shape,user_guide/torch_compiler/export.md,m
+11,what does torch.nn.functional.linear do,user_guide/torch_compiler/export/ir_spec.md,m
+12,how to save and load a model for inference,user_guide/torch_compiler/torch.compiler_aot_inductor.md,m
+13,convert numpy array to pytorch tensor,tensors.rst,b
+14,how to flatten a tensor before linear layer,distributed.pipelining.md,m
+15,implement custom autograd function,notes/extending.func.rst,t
+16,how do I batch insert records into a database,data.md,m
+17,pytorch vs tensorflow for deep learning,user_guide/index.md,t
+18,my model weights are not changing during training,optim.md,m
+19,why is my loss nan,notes/faq.rst,m
+20,view vs reshape,tensor_view.rst,t
+21,how to update learning rate in middle of training,optim.md,b
